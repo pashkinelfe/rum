@@ -550,13 +550,7 @@ rumHeapTupleBulkInsert(RumBuildState * buildstate, OffsetNumber attnum,
 }
 
 static void
-rumBuildCallback(Relation index,
-#if PG_VERSION_NUM < 130000
-				 HeapTuple htup,
-#else
-				 ItemPointer tid,
-#endif
-				 Datum *values,
+rumBuildCallback(Relation index, ItemPointer tid, Datum *values,
 				 bool *isnull, bool tupleIsAlive, void *state)
 {
 	RumBuildState *buildstate = (RumBuildState *) state;
@@ -564,9 +558,6 @@ rumBuildCallback(Relation index,
 	int			i;
 	Datum		outerAddInfo = (Datum) 0;
 	bool		outerAddInfoIsNull = true;
-#if PG_VERSION_NUM < 130000
-	ItemPointer tid = &htup->t_self;
-#endif
 
 	if (AttributeNumberIsValid(buildstate->rumstate.attrnAttachColumn))
 	{

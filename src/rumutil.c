@@ -85,23 +85,23 @@ _PG_init(void)
 						 "Column name to attach as additional info",
 						 NULL, NULL
 #if PG_VERSION_NUM >= 130000
-						 , AccessExclusiveLock
+						 ,AccessExclusiveLock
 #endif
-						 );
+						);
 	add_string_reloption(rum_relopt_kind, "to",
 						 "Column name to add a order by column",
 						 NULL, NULL
 #if PG_VERSION_NUM >= 130000
-						 , AccessExclusiveLock
+						 ,AccessExclusiveLock
 #endif
-						  );
+						);
 	add_bool_reloption(rum_relopt_kind, "order_by_attach",
 			  "Use (addinfo, itempointer) order instead of just itempointer",
 					   false
 #if PG_VERSION_NUM >= 130000
-					   , AccessExclusiveLock
+						 ,AccessExclusiveLock
 #endif
-					   );
+						);
 }
 
 /*
@@ -892,30 +892,11 @@ rumoptions(Datum reloptions, bool validate)
 		{"to", RELOPT_TYPE_STRING, offsetof(RumOptions, addToColumn)},
 		{"order_by_attach", RELOPT_TYPE_BOOL, offsetof(RumOptions, useAlternativeOrder)}
 	};
-#if PG_VERSION_NUM < 130000
-	relopt_value *options;
-	RumOptions *rdopts;
-	int			numoptions;
 
-	options = parseRelOptions(reloptions, validate, rum_relopt_kind,
-							  &numoptions);
-
-	/* if none set, we're done */
-	if (numoptions == 0)
-		return NULL;
-
-	rdopts = allocateReloptStruct(sizeof(RumOptions), options, numoptions);
-
-	fillRelOptions((void *) rdopts, sizeof(RumOptions), options, numoptions,
-				   validate, tab, lengthof(tab));
-
-	pfree(options);
-
-	return (bytea *) rdopts;
-#else
-	return (bytea *) build_reloptions(reloptions, validate, rum_relopt_kind,
-									  sizeof(RumOptions), tab, lengthof(tab));
-#endif
+	return (bytea *) build_reloptions(reloptions, validate,
+										rum_relopt_kind,
+										sizeof(RumOptions),
+										tab, lengthof(tab));
 }
 
 bool
